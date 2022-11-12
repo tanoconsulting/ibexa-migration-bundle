@@ -1,0 +1,68 @@
+{
+    "name": "tanoconsulting/ibexa-migration-bundle",
+    "type": "symfony-bundle",
+    "description": "The port of Kaliop eZ-Migration Bundle to Ibexa 4",
+    "keywords": ["migrations", "database", "ibexa"],
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Douglas Hammond",
+            "email": "wizhippo@gmail.com",
+            "role": "Original author"
+        },
+        {
+            "name": "Gaetano Giunta",
+            "email": "ggiunta@tanoconsulting.com",
+            "role": "Lead Developer"
+        },
+        {
+            "name": "Peter Halasz",
+            "role": "Original author"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^7.4|^8.0",
+        "ext-ctype": "*",
+        "ext-json": "*",
+        "ext-pdo": "*",
+        "doctrine/dbal": "^2.11|^3.0",
+        "ibexa/core": "^4.0",
+        "mtdowling/jmespath.php": "^2.0.0",
+        "nikic/php-parser": "^4.2.2",
+        "symfony/process": "*",
+        "symfony/swiftmailer-bundle": "*",
+        "symfony/validator": "*",
+        "symfony/var-dumper": "*"
+    },
+    "require-dev": {
+        "mikey179/vfsstream": "^2.0@dev",
+        "phpunit/phpunit": "^8.5.12"
+    },
+    "conflict": {
+        "kaliop/ezmigrationbundle": "*",
+        "tanoconsulting/ezmigrationbundle2": "*"
+    },
+    "suggest": {
+        "php-http/httplug-bundle": "Required for usage of HTTP/CALL migration steps"
+    },
+    "autoload": {
+        "psr-4": { "Kaliop\\eZMigrationBundle\\": "" }
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "ibexa/post-install": true,
+            "symfony/flex": true,
+            "symfony/runtime": true,
+            "symfony/thanks": true
+        }
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/tanoconsulting"
+        }
+    ]
+}

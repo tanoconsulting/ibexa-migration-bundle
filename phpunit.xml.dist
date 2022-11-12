@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- some of the tests we execute do generate php warnings, sadly... we have to swallow them -->
+<phpunit colors="true" bootstrap="Tests/bootstrap.php" convertNoticesToExceptions="false" convertWarningsToExceptions="false">
+
+    <php>
+        <!-- the following have been moved to env vars, as they might vary depending on setups -->
+        <!--<server name="KERNEL_CLASS" value="App\Kernel" />
+        <server name="APP_ENV" value="behat" />-->
+        <server name="APP_DEBUG" value="false" />
+    </php>
+
+    <!-- code coverage reporting -->
+    <filter>
+        <whitelist>
+            <directory suffix=".php">./</directory>
+            <exclude>
+                <directory>./Resources</directory>
+                <directory>./Tests</directory>
+                <directory>./vendor</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+
+    <testsuites>
+        <testsuite name="TanoConsulting Ibexa Migration Bundle Test Suite">
+            <directory>./Tests/phpunit/</directory>
+        </testsuite>
+    </testsuites>
+
+</phpunit>
