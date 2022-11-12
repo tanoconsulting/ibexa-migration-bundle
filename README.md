@@ -440,9 +440,9 @@ You can even keep multiple test stacks available in parallel, by using different
 - run the tests via: `./teststack/teststack -e .euts.env.local runtests`
 
 
-[![License](https://poser.pugx.org/tanoconsulting/ezmigrationbundle3/license)](https://packagist.org/packages/tanoconsulting/ezmigrationbundle3)
-[![Latest Stable Version](https://poser.pugx.org/tanoconsulting/ezmigrationbundle3/v/stable)](https://packagist.org/packages/tanoconsulting/ezmigrationbundle3)
-[![Total Downloads](https://poser.pugx.org/tanoconsulting/ezmigrationbundle3/downloads)](https://packagist.org/packages/tanoconsulting/ezmigrationbundle3)
+[![License](https://poser.pugx.org/tanoconsulting/ibexa-migration-bundle/license)](https://packagist.org/packages/tanoconsulting/ibexa-migration-bundle)
+[![Latest Stable Version](https://poser.pugx.org/tanoconsulting/ibexa-migration-bundle/v/stable)](https://packagist.org/packages/tanoconsulting/ibexa-migration-bundle)
+[![Total Downloads](https://poser.pugx.org/tanoconsulting/ibexa-migration-bundle/downloads)](https://packagist.org/packages/tanoconsulting/ibexa-migration-bundle)
 
-[![Build Status](https://github.com/tanoconsulting/ezmigrationbundle3/actions/workflows/ci.yml/badge.svg)](https://github.com/tanoconsulting/ezmigrationbundle3/actions/workflows/ci.yml)
-[![Code Coverage](https://codecov.io/gh/tanoconsulting/ezmigrationbundle3/branch/main/graph/badge.svg)](https://codecov.io/gh/tanoconsulting/ezmigrationbundle3/tree/main)
+[![Build Status](https://github.com/tanoconsulting/ibexa-migration-bundle/actions/workflows/ci.yml/badge.svg)](https://github.com/tanoconsulting/ibexa-migration-bundle/actions/workflows/ci.yml)
+[![Code Coverage](https://codecov.io/gh/tanoconsulting/ibexa-migration-bundle/branch/main/graph/badge.svg)](https://codecov.io/gh/tanoconsulting/ibexa-migration-bundle/tree/main)
