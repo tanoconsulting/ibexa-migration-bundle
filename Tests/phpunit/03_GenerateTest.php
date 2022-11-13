@@ -7,7 +7,7 @@ include_once(__DIR__.'/CommandExecutingTest.php');
  */
 class GenerateTest extends CommandExecutingTest
 {
-    protected $targetBundle = 'EzPublishCoreBundle'; // it is always present :-)
+    protected $targetBundle = 'IbexaCoreBundle'; // it is always present :-)
 
     /**
      * Tests the kaliop:migration:generate command

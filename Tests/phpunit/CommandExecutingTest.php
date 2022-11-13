@@ -1,6 +1,6 @@
 <?php
 
-use Symfony\Component\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -16,9 +16,6 @@ abstract class CommandExecutingTest extends KernelTestCase
     protected $app;
     /** @var StreamOutput $output */
     protected $output;
-
-    // tell to phpunit not to mess with ezpublish legacy global vars...
-    protected $backupGlobalsBlacklist = array('eZCurrentAccess');
 
     protected function setUp(): void
     {

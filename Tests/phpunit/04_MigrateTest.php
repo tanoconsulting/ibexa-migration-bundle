@@ -368,7 +368,7 @@ class MigrateTest extends MigrationExecutingTest
     protected function getRepository($loginUserId = \Kaliop\eZMigrationBundle\Core\MigrationService::ADMIN_USER_ID)
     {
         // q: do we need bootContainer() here or would getContainer() do ?
-        $repository = $this->getBootedContainer()->get('ezpublish.api.repository');
+        $repository = $this->getBootedContainer()->get('ibexa.api.repository');
         $permissionResolver = $repository->getPermissionResolver();
         $currentUserId = $permissionResolver->getCurrentUserReference()->getUserId();
         if ($loginUserId !== false && ($currentUserId != $loginUserId)) {

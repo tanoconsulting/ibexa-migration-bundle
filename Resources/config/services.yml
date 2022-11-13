@@ -528,7 +528,7 @@ services:
             - '@ez_migration_bundle.object_state_matcher'
             - '@ez_migration_bundle.user_matcher'
             - '%ez_migration_bundle.query_limit%'
-            - '@?ezpublish.query_type.registry'
+            - '@?Ibexa\Core\QueryType\ArrayQueryTypeRegistry'
 
     ez_migration_bundle.content_type_matcher:
         class: '%ez_migration_bundle.content_type_matcher.class%'
@@ -560,7 +560,7 @@ services:
             - '@ez_migration_bundle.object_state_matcher'
             - '@ez_migration_bundle.user_matcher'
             - '%ez_migration_bundle.query_limit%'
-            - '@?ezpublish.query_type.registry'
+            - '@?Ibexa\Core\QueryType\ArrayQueryTypeRegistry'
 
     ez_migration_bundle.object_state_matcher:
         class: '%ez_migration_bundle.object_state_matcher.class%'
@@ -640,8 +640,8 @@ services:
         class: '%ez_migration_bundle.complex_field.ezbinaryfile.class%'
         arguments:
             - "$io.root_dir$"
-            - "@?ezpublish.core.io.prefix_url_decorator"
-            - "@?ezpublish.fieldType.ezbinaryfile.io_service"
+            - "@?ibexa.core.io.default_url_decorator"
+            - "@?ibexa.field_type.ezbinaryfile.io_service"
         tags:
             - { name: ez_migration_bundle.complex_field, fieldtype: ezbinaryfile, priority: 0 }
 
@@ -677,7 +677,7 @@ services:
         class: '%ez_migration_bundle.complex_field.ezimage.class%'
         arguments:
             - "$io.root_dir$"
-            - "@?ezpublish.core.io.prefix_url_decorator"
+            - "@?ibexa.core.io.default_url_decorator"
         tags:
             - { name: ez_migration_bundle.complex_field, fieldtype: ezimage, priority: 0 }
 
@@ -687,7 +687,7 @@ services:
         class: '%ez_migration_bundle.complex_field.ezmatrix.class%'
         #arguments:
         #    - "$io.root_dir$"
-        #    - "@?ezpublish.core.io.prefix_url_decorator"
+        #    - "@?ibexa.core.io.default_url_decorator"
         tags:
             - { name: ez_migration_bundle.complex_field, fieldtype: ezmatrix, priority: 0 }
 
@@ -696,8 +696,8 @@ services:
         class: '%ez_migration_bundle.complex_field.ezmedia.class%'
         arguments:
             - "$io.root_dir$"
-            - "@?ezpublish.core.io.prefix_url_decorator"
-            - "@?ezpublish.fieldType.ezbinaryfile.io_service"
+            - "@?ibexa.core.io.default_url_decorator"
+            - "@?ibexa.field_type.ezbinaryfile.io_service"
         tags:
             - { name: ez_migration_bundle.complex_field, fieldtype: ezmedia, priority: 0 }
 
