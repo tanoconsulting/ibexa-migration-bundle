@@ -7,11 +7,7 @@ This bundle makes it easy to programmatically deploy changes to Ibexa database s
 
 It is inspired by the [DoctrineMigrationsBundle](http://symfony.com/doc/current/bundles/DoctrineMigrationsBundle/index.html)
 
-You can think of it as the great-grandson of the legacy [ezxmlinstaller](https://github.com/ezsystems/ezxmlinstaller) extension.
-
-*WORK IN PROGRESS*
-
-Please read [WHATSNEW.md](WHATSNEW.md) for details!
+*WORK IN PROGRESS* Please read [WHATSNEW.md](WHATSNEW.md) for details!
 
 *Many thanks to [Wizhippo](https://github.com/wizhippo) for having started this version, and kindly donated the code!*
 
@@ -21,6 +17,8 @@ Please read [WHATSNEW.md](WHATSNEW.md) for details!
 
 * Ibexa 4.0 (aka. Ibexa DXP).
 
+For Ibexa DXP 3, head on to https://github.com/tanoconsulting/ezmigrationbundle2. For eZPlatform 1-2 and earlier, to
+https://github.com/kaliop-uk/ezmigrationbundle.
 
 ## Installation
 
