@@ -2,11 +2,9 @@
 
 namespace Kaliop\eZMigrationBundle\Core;
 
+use Ibexa\Contracts\Core\Repository\Repository;
 use Kaliop\eZMigrationBundle\API\ReferenceBagInterface;
 use Kaliop\eZMigrationBundle\API\Value\MigrationStep;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Ibexa\Contracts\Core\Repository\Repository;
 use Kaliop\eZMigrationBundle\API\Collection\MigrationDefinitionCollection;
 use Kaliop\eZMigrationBundle\API\StorageHandlerInterface;
 use Kaliop\eZMigrationBundle\API\LoaderInterface;
@@ -17,6 +15,7 @@ use Kaliop\eZMigrationBundle\API\Value\Migration;
 use Kaliop\eZMigrationBundle\API\Value\MigrationDefinition;
 use Kaliop\eZMigrationBundle\API\Exception\MigrationStepExecutionException;
 use Kaliop\eZMigrationBundle\API\Exception\MigrationAbortedException;
+use Kaliop\eZMigrationBundle\API\Exception\MigrationBundleException;
 use Kaliop\eZMigrationBundle\API\Exception\MigrationSuspendedException;
 use Kaliop\eZMigrationBundle\API\Exception\MigrationStepSkippedException;
 use Kaliop\eZMigrationBundle\API\Exception\AfterMigrationExecutionException;
@@ -24,6 +23,8 @@ use Kaliop\eZMigrationBundle\API\Event\BeforeStepExecutionEvent;
 use Kaliop\eZMigrationBundle\API\Event\StepExecutedEvent;
 use Kaliop\eZMigrationBundle\API\Event\MigrationAbortedEvent;
 use Kaliop\eZMigrationBundle\API\Event\MigrationSuspendedEvent;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MigrationService implements ContextProviderInterface
 {
@@ -31,6 +32,7 @@ class MigrationService implements ContextProviderInterface
 
     /**
      * The default Admin user Id, used when no Admin user is specified
+     * @deprecated kept around for BC. Use ADMIN_USER_LOGIN instead
      */
     const ADMIN_USER_ID = 14;
 
@@ -43,6 +45,7 @@ class MigrationService implements ContextProviderInterface
      * @var LoaderInterface $loader
      */
     protected $loader;
+
     /**
      * @var StorageHandlerInterface $storageHandler
      */
@@ -126,8 +129,7 @@ class MigrationService implements ContextProviderInterface
     }
 
     /**
-     * @todo we could get rid of this by getting $output passed as argument to self::executeMigration. We are not doing
-     *       that for BC for the moment (self::executeMigration api should be redone, but it is used in WorkfloBundle too)
+     * @todo we could get rid of this by getting $output passed as argument to self::executeMigration.
      */
     public function setOutput(OutputInterface $output)
     {
@@ -237,6 +239,27 @@ class MigrationService implements ContextProviderInterface
     }
 
     /**
+     * Not to be called by external users for normal use cases, you should use executeMigration() instead.
+     * NB: will act regardless of current migration status.
+     *
+     * @param Migration $migration
+     */
+    public function failMigration(Migration $migration, $errorMessage)
+    {
+        return $this->storageHandler->endMigration(
+            new Migration(
+                $migration->name,
+                $migration->md5,
+                $migration->path,
+                $migration->executionDate,
+                Migration::STATUS_FAILED,
+                $errorMessage
+            ),
+            true
+        );
+    }
+
+    /**
      * Parses a migration definition, return a parsed definition.
      * If there is a parsing error, the definition status will be updated accordingly
      *
@@ -269,40 +292,39 @@ class MigrationService implements ContextProviderInterface
             }
         }
 
-        throw new \Exception("No parser available to parse migration definition '{$migrationDefinition->name}'");
+        throw new MigrationBundleException("No parser available to parse migration definition '{$migrationDefinition->name}'");
     }
 
     /**
      * @param MigrationDefinition $migrationDefinition
-     * @param bool $useTransaction when set to false, no repo transaction will be used to wrap the migration
-     * @param string $defaultLanguageCode
-     * @param string|int|false|null $adminLogin when false, current user is used; when null, hardcoded admin account
-     * @param bool $force when true, execute a migration if it was already in status DONE or SKIPPED (would throw by default)
-     * @param bool|null forceSigchildEnabled
+     * @param array $migrationContext Supported array keys are: adminUserLogin, defaultLanguageCode,
+     *                                forcedReferences, forceExecution, forceSigchildEnabled, userContentType, userGroupContentType,
+     *                                useTransaction.
      * @throws \Exception
      *
+     * @todo add support for setting in $migrationContext a userContentType, userGroupContentType ?
      * @todo treating a null and false $adminLogin values differently is prone to hard-to-track errors.
      *       Shall we use instead -1 to indicate the desire to not-login-as-admin-user-at-all ?
-     * @todo refactor. There are too many parameters here to add more. Move to a single parameter: array of options or value-object
      */
-    public function executeMigration(MigrationDefinition $migrationDefinition, $useTransaction = true,
-        $defaultLanguageCode = null, $adminLogin = null, $force = false, $forceSigchildEnabled = null)
+    public function executeMigration(MigrationDefinition $migrationDefinition, $migrationContext = array())
     {
         if ($migrationDefinition->status == MigrationDefinition::STATUS_TO_PARSE) {
             $migrationDefinition = $this->parseMigrationDefinition($migrationDefinition);
         }
 
         if ($migrationDefinition->status == MigrationDefinition::STATUS_INVALID) {
-            throw new \Exception("Can not execute " . $this->getEntityName($migrationDefinition). " '{$migrationDefinition->name}': {$migrationDefinition->parsingError}");
+            throw new MigrationBundleException("Can not execute " . $this->getEntityName($migrationDefinition). " '{$migrationDefinition->name}': {$migrationDefinition->parsingError}");
         }
 
-        /// @todo add support for setting in $migrationContext a userContentType, userGroupContentType ?
-        $migrationContext = $this->migrationContextFromParameters($defaultLanguageCode, $adminLogin, $forceSigchildEnabled);
+        if ($this->output) {
+            $migrationContext['output'] = $this->output;
+        }
+        $forceExecution = array_key_exists('forceExecution', $migrationContext) ? $migrationContext['forceExecution'] : false;
 
         // set migration as begun - has to be in own db transaction
-        $migration = $this->storageHandler->startMigration($migrationDefinition, $force);
+        $migration = $this->storageHandler->startMigration($migrationDefinition, $forceExecution);
 
-        $this->executeMigrationInner($migration, $migrationDefinition, $migrationContext, 0, $useTransaction, $adminLogin);
+        $this->executeMigrationInner($migration, $migrationDefinition, $migrationContext);
     }
 
     /**
@@ -310,13 +332,30 @@ class MigrationService implements ContextProviderInterface
      * @param MigrationDefinition $migrationDefinition
      * @param array $migrationContext
      * @param int $stepOffset
-     * @param bool $useTransaction when set to false, no repo transaction will be used to wrap the migration
-     * @param string|int|false|null $adminLogin used only for committing db transaction if needed. If false or null, hardcoded admin is used
      * @throws \Exception
      */
     protected function executeMigrationInner(Migration $migration, MigrationDefinition $migrationDefinition,
-        $migrationContext, $stepOffset = 0, $useTransaction = true, $adminLogin = null)
+        $migrationContext, $stepOffset = 0)
     {
+        $useTransaction = array_key_exists('useTransaction', $migrationContext) ? $migrationContext['useTransaction'] : true;
+        $adminLogin = array_key_exists('adminLogin', $migrationContext) ? $migrationContext['adminLogin'] : null;
+
+        /// @todo can we make this validation smarter / move it somewhere else?
+        if (array_key_exists('path', $migrationContext) || array_key_exists('contentTypeIdentifier', $migrationContext) ||
+            array_key_exists('fieldIdentifier', $migrationContext)) {
+            throw new MigrationBundleException("Invalid call to executeMigrationInner: forbidden elements in migrationContext");
+        }
+
+        $messageSuffix = '';
+        if (isset($migrationContext['forcedReferences']) && count($migrationContext['forcedReferences'])) {
+            $messageSuffix = array();
+            foreach ($migrationContext['forcedReferences'] as $name => $value) {
+                $this->referenceResolver->addReference($name, $value, true);
+                $messageSuffix[] = "$name: $value";
+            }
+            $messageSuffix = 'Injected references: ' . implode(', ', $messageSuffix);
+        }
+
         if ($useTransaction) {
             $this->repository->beginTransaction();
         }
@@ -329,7 +368,7 @@ class MigrationService implements ContextProviderInterface
 
             $i = $stepOffset+1;
             $finalStatus = Migration::STATUS_DONE;
-            $finalMessage = null;
+            $finalMessage = '';
 
             try {
 
@@ -377,6 +416,8 @@ class MigrationService implements ContextProviderInterface
                 $finalStatus = Migration::STATUS_SUSPENDED;
                 $finalMessage = "Suspended in execution of step $i: " . $e->getMessage();
             }
+
+            $finalMessage = ($finalMessage != '' && $messageSuffix != '') ? $finalMessage . '. '. $messageSuffix : $finalMessage . $messageSuffix;
 
             // in case we have an exception thrown in the commit phase after the last step, make sure we report the correct step
             $i--;
@@ -435,6 +476,8 @@ class MigrationService implements ContextProviderInterface
                 }
             }
 
+            $errorMessage = ($errorMessage != '' && $messageSuffix != '') ? $errorMessage . '. '. $messageSuffix : $errorMessage . $messageSuffix;
+
             // set migration as failed
             // NB: we use the 'force' flag here because we might be catching an exception happened during the call to
             // $this->repository->commit() above, in which case the Migration might already be in the DB with a status 'done'
@@ -450,27 +493,26 @@ class MigrationService implements ContextProviderInterface
                 true
             );
 
-            throw $exception ? $exception : new MigrationStepExecutionException($errorMessage, $i, $e);
+            throw ($exception ? $exception : new MigrationStepExecutionException($errorMessage, $i, $e));
         }
     }
 
     /**
      * @param Migration $migration
-     * @param bool $useTransaction
-     * @param array $forcedReferences
+     * @param array $migrationContext see executeMigration
      * @throws \Exception
      *
      * @todo add support for adminLogin ?
      */
-    public function resumeMigration(Migration $migration, $useTransaction = true, array $forcedReferences = array())
+    public function resumeMigration(Migration $migration, $migrationContext = array())
     {
         if ($migration->status != Migration::STATUS_SUSPENDED) {
-            throw new \Exception("Can not resume ".$this->getEntityName($migration)." '{$migration->name}': it is not in suspended status");
+            throw new MigrationBundleException("Can not resume ".$this->getEntityName($migration)." '{$migration->name}': it is not in suspended status");
         }
 
         $migrationDefinitions = $this->getMigrationsDefinitions(array($migration->path));
         if (!count($migrationDefinitions)) {
-            throw new \Exception("Can not resume ".$this->getEntityName($migration)." '{$migration->name}': its definition is missing");
+            throw new MigrationBundleException("Can not resume ".$this->getEntityName($migration)." '{$migration->name}': its definition is missing");
         }
 
         $defs = $migrationDefinitions->getArrayCopy();
@@ -478,24 +520,17 @@ class MigrationService implements ContextProviderInterface
 
         $migrationDefinition = $this->parseMigrationDefinition($migrationDefinition);
         if ($migrationDefinition->status == MigrationDefinition::STATUS_INVALID) {
-            throw new \Exception("Can not resume ".$this->getEntityName($migration)." '{$migration->name}': {$migrationDefinition->parsingError}");
+            throw new MigrationBundleException("Can not resume ".$this->getEntityName($migration)." '{$migration->name}': {$migrationDefinition->parsingError}");
         }
 
         // restore context
         $this->contextHandler->restoreCurrentContext($migration->name);
-
-        if ($forcedReferences) {
-            foreach($forcedReferences as $name => $value) {
-                $this->referenceResolver->addReference($name, $value, true);
-            }
-        }
-
         if (!isset($this->migrationContext[$migration->name])) {
-            throw new \Exception("Can not resume ".$this->getEntityName($migration)." '{$migration->name}': the stored context is missing");
+            throw new MigrationBundleException("Can not resume ".$this->getEntityName($migration)." '{$migration->name}': the stored context is missing");
         }
         $restoredContext = $this->migrationContext[$migration->name];
-        if (!is_array($restoredContext) || !isset($restoredContext['context']) || !isset($restoredContext['step'] )) {
-            throw new \Exception("Can not resume ".$this->getEntityName($migration)." '{$migration->name}': the stored context is invalid");
+        if (!is_array($restoredContext) || !isset($restoredContext['context']) || !isset($restoredContext['step'])) {
+            throw new MigrationBundleException("Can not resume ".$this->getEntityName($migration)." '{$migration->name}': the stored context is invalid");
         }
 
         // update migration status
@@ -506,37 +541,8 @@ class MigrationService implements ContextProviderInterface
 
         // and go
         // note: we store the current step counting starting at 1, but use offset starting at 0, hence the -1 here
-        $this->executeMigrationInner($migration, $migrationDefinition, $restoredContext['context'],
-            $restoredContext['step'] - 1, $useTransaction);
-    }
-
-    /**
-     * @param string $defaultLanguageCode
-     * @param string|int|false $adminLogin
-     * @param bool|null $forceSigchildEnabled
-     * @return array
-     */
-    protected function migrationContextFromParameters($defaultLanguageCode = null, $adminLogin = null, $forceSigchildEnabled = null )
-    {
-        $properties = array();
-
-        if ($defaultLanguageCode != null) {
-            $properties['defaultLanguageCode'] = $defaultLanguageCode;
-        }
-        // nb: other parts of the codebase treat differently a false and null values for $properties['adminUserLogin']
-        if ($adminLogin !== null) {
-            $properties['adminUserLogin'] = $adminLogin;
-        }
-        if ($forceSigchildEnabled !== null)
-        {
-            $properties['forceSigchildEnabled'] = $forceSigchildEnabled;
-        }
-
-        if ($this->output) {
-            $properties['output'] = $this->output;
-        }
-
-        return $properties;
+        $this->executeMigrationInner($migration, $migrationDefinition,  array_merge($restoredContext['context'], $migrationContext),
+            $restoredContext['step'] - 1);
     }
 
     protected function injectContextIntoStep(MigrationStep $step, array $context)
@@ -620,6 +626,7 @@ class MigrationService implements ContextProviderInterface
     }
 
     /**
+     * This gets called when we call $this->contextHandler->restoreCurrentContext().
      * @param string $migrationName
      * @param array $context
      */

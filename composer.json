@@ -20,8 +20,6 @@
             "role": "Original author"
         }
     ],
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "require": {
         "php": "^7.4|^8.0",
         "ext-ctype": "*",
@@ -31,13 +29,13 @@
         "ibexa/core": "^4.0",
         "mtdowling/jmespath.php": "^2.0.0",
         "nikic/php-parser": "^4.2.2",
+        "symfony/expression-language": "*",
         "symfony/process": "*",
         "symfony/swiftmailer-bundle": "*",
         "symfony/validator": "*",
         "symfony/var-dumper": "*"
     },
     "require-dev": {
-        "mikey179/vfsstream": "^2.0@dev",
         "phpunit/phpunit": "^8.5.12"
     },
     "conflict": {

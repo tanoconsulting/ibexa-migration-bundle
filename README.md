@@ -7,8 +7,6 @@ This bundle makes it easy to programmatically deploy changes to Ibexa database s
 
 It is inspired by the [DoctrineMigrationsBundle](http://symfony.com/doc/current/bundles/DoctrineMigrationsBundle/index.html)
 
-*WORK IN PROGRESS* Please read [WHATSNEW.md](WHATSNEW.md) for details!
-
 *Many thanks to [Wizhippo](https://github.com/wizhippo) for having started this version, and kindly donated the code!*
 
 ## Requirements
@@ -17,14 +15,21 @@ It is inspired by the [DoctrineMigrationsBundle](http://symfony.com/doc/current/
 
 * Ibexa 4.0 (aka. Ibexa DXP).
 
-For Ibexa DXP 3, head on to https://github.com/tanoconsulting/ezmigrationbundle2. For eZPlatform 1-2 and earlier, to
-https://github.com/kaliop-uk/ezmigrationbundle.
+For Ibexa DXP 3, head on to [tanoconsulting/ezmigrationbundle2](https://github.com/tanoconsulting/ezmigrationbundle2). For eZPlatform 1-2 and earlier, to
+[kaliop-uk/ezmigrationbundle](https://github.com/kaliop-uk/ezmigrationbundle).
+
 
 ## Installation
 
-ATM there is no stable release. The `master` branch is now `main`, so you have to run:
+In either `require` or `require-dev` at the end of the bundle list in the composer.json file add:
 
-    composer require 'tanoconsulting/ibexa-migration-bundle:dev-main'
+    composer require 'tanoconsulting/ibexa-migration-bundle:^1.0'
+
+Save it and run
+
+    composer update --dev tanoconsulting/ibexa-migration-bundle
+
+This will install the bundle and all its dependencies.
 
 Then make sure that the bundle is active, generally by editing `config/bundles.php`
 
@@ -47,6 +52,8 @@ This indicates that the bundle has been installed and registered correctly.
 To get the latest version, you can update the bundle to the latest available version by using `composer`
 
     composer update tanoconsulting/ibexa-migration-bundle
+
+For upgrades from kaliop/ezmigrationbundle, see the instructions in [ezmigrationbundle_to_ibexamigrationbundle.md](Resources/doc/Upgrading/ezmigrationbundle_to_ibexamigrationbundle.md).
 
 ## Getting started
 
@@ -118,31 +125,34 @@ A simple example of a migration to create a 'folder' content is:
         attributes:
             name: hello world
 
-In a Yaml migration, you can define the following types of actions:
-- creation, update and deletion of Contents
-- creation, update and deletion of ContentTypes
-- creation, update and  deletion of ContentTypeGroups
-- deletion of Content Versions
-- creation and deletion of Languages
-- creation, update and deletion of Locations
-- creation, update and deletion of ObjectStates
-- creation, update and deletion of ObjectStateGroups
-- creation, update and deletion of Roles
-- creation, update and deletion of Sections
-- creation and deletion of Tags (from the Netgen Tags Bundle)
-- creation, update and deletion of Users
-- creation, update and deletion of UserGroups
-- purging and recovering Contents from the Trash
-- creation, appending, copy, renaming and deletion of files
-- execution of SQL queries
-- execution of command-line scripts
-- execution of methods of Symfony services
-- execution of http calls
-- sending of email
-- looping over arrays and executing one of the above actions on each element
-- canceling, snoozing or suspending the migration itself
+In a Yaml migration, you can execute the following types of actions:
+- creation, update and deletion of [Contents](Resources/doc/DSL/Contents.yml)
+- creation, update and deletion of [ContentTypes](Resources/doc/DSL/ContentTypes.yml)
+- creation, update and deletion of [ContentTypeGroups](Resources/doc/DSL/ContentTypeGroups.yml)
+- deletion of [Content Versions](Resources/doc/DSL/ContentVersions.yml)
+- creation and deletion of [Languages](Resources/doc/DSL/Languages.yml)
+- creation, update and deletion of [Locations](Resources/doc/DSL/Locations.yml)
+- creation, update and deletion of [ObjectStates](Resources/doc/DSL/ObjectStatesAndGroups.yml)
+- creation, update and deletion of [ObjectStateGroups](Resources/doc/DSL/ObjectStatesAndGroups.yml)
+- creation, update and deletion of [Roles](Resources/doc/DSL/RolesAndPolicies.yml)
+- creation, update and deletion of [Sections](Resources/doc/DSL/Sections.yml)
+- creation and deletion of [Tags](Resources/doc/DSL/Tags.yml) (from the Netgen Tags Bundle)
+- creation and deletion of [URL aliases](Resources/doc/DSL/UrlAliases.yml) and [wildcards](Resources/doc/DSL/UrlWildcards.yml)
+- creation, update and deletion of [Users](Resources/doc/DSL/UsersAndGroups.yml)
+- creation, update and deletion of [UserGroups](Resources/doc/DSL/UsersAndGroups.yml)
+- purging and recovering Contents from the [Trash](Resources/doc/DSL/Trash.yml)
+- creation, appending, copy, renaming and deletion of [files](Resources/doc/DSL/Files.yml)
+- execution of [SQL queries](Resources/doc/DSL/SQL.yml)
+- execution of [command-line scripts](Resources/doc/DSL/Processes.yml)
+- execution of methods of Symfony services](Resources/doc/DSL/Services.yml)
+- execution of [php functions and static methods](Resources/doc/DSL/PHP.yml)
+- execution of [http calls](Resources/doc/DSL/HTTP.yml)
+- sending of [email](Resources/doc/DSL/Mails.yml)
+- looping over [arrays](Resources/doc/DSL/Loops.yml) and executing one of the above actions on each element
+- canceling, snoozing or suspending the [migration itself](Resources/doc/DSL/Migrations.yml)
+- generating and saving new [migration definitions](Resources/doc/DSL/MigrationDefinitions.yml)
 
-The docs describing all supported parameters are in the [DSL Language description](Resources/doc/DSL/README.md)
+More details on all supported migration-language features are in the [DSL Language description](Resources/doc/DSL/README.md)
 
 ### Custom migrations
 
@@ -190,12 +200,17 @@ As you can see in the generated definition, the php class to be used for a migra
 interface. The Symfony DIC container is passed to the migration class so that it can access from it all the services,
 parameters and other thing that it needs.
 
+For a more detailed example of a migration definition done in PHP, look [in the MigrationVersions](MigrationVersions/20100101000200_MigrateV1ToV2.php) folder of this very bundle.
+
 *NB* if you rename the php file, keep in mind that the filename and the name of the class it contains are tied - the
 standard autoloading mechanism of the application does not apply when loading the migration definition. This is also
 the reason why the php classes used as migrations should not use namespaces.
 
 *NB* it is also possible to run any method of any existing Symfony service just by declaring it as migration step
 in a yaml migration. See the [relevant DSL](Resources/doc/DSL/Service.yml) for details.
+
+*NB* it is also possible to run any existing php function or static class method just by declaring it as migration step
+in a yaml migration. See the [relevant DSL](Resources/doc/DSL/PHP.yml) for details.
 
 ### Re-executing failed migrations
 
@@ -262,6 +277,8 @@ and the corresponding php class:
         }
     }
 
+Event Subscribers are supported as an alternative to Event Listeners, as is standard with Symfony projects.
+
 
 ## Known Issues and limitations
 
@@ -272,15 +289,7 @@ and the corresponding php class:
   For the moment, the best workaround is to use the `filter-expression` parameter on the command-line when running
   `doctrine:migrations:diff` and friends, with a value of `kaliop_migrations_*`
 
-* if you get fatal errors when running a migration stating that a node or object has not been found, it is most likely
-  related to how the dual-kernel works in eZPublish, and the fact that the legacy and Symfony kernels use a separate
-  connection to the database. Since the migration bundle by default wraps all database changes for a migration in a
-  database transaction, when the Slots are fired which allow the legacy kernel to clear its caches, the legacy kernel
-  cannot see the database changes applied by the Symfony kernel, and, depending on the specific Slot in use, might
-  fail with a fatal error.
-  The simplest workaround is to disable usage of transactions by passing the `-u` flag to the `migrate` command.
-
-* similar symptoms can manifest themselves when you are using the Solr Search Engine Bundle.
+* fatal errors when running a migration can manifest themselves when you are using the Solr Search Engine Bundle.
   In this case the problem is compounded the fact that, even if a node or object is sent to Solr from within a database
   transaction, the Solr search index might be configured to only commit received data within a short time delay.
   A known workaround involve:
@@ -299,6 +308,8 @@ and the corresponding php class:
     - increase the maximum amount of memory allowed for the php script by running it with option '-d memory_limit=-1'
     - execute the migration command using a Symfony environment which has reduced logging and kernel debug disabled:
       the default configuration for the `dev` environment is known to leak memory
+    - transform the migration, where possible, into one which loads and modifies contents one by one in a loop, instead
+        of modifying them all in a single action. See an example of using loops [here](Resources/doc/Cookbook/move_all_children_of_a_location.yml).
 
 * if you get fatal errors with the message 'You cannot create a service ("request") of an inactive scope ("request")',
   take a look at the following issue for a possible explanation and ideas for workarounds:
@@ -316,6 +327,11 @@ and the corresponding php class:
             type: ezstring
             name: Topbar-hover-color
             identifier: topbar-hover-color
+
+* when eZ is set up in cluster mode, if you are setting references to the path of a content field of type ezimage,
+  ezbinaryfile or ezmedia, or generating a migration for creating/updating it, the value you will get for the path will
+  not be the absolute path on disk, but the path relative to the 'nfsvar' directory, which makes it unsuitable for
+  being used directly in eg. a content/create migration. Check out the example in the Cookbook for how to deal with this.
 
 
 ## Frequently asked questions
@@ -338,6 +354,9 @@ to store a different value for each Symfony environment. For example:
             content_id: "reference:content_id_ref"
         etc: ...
 
+Note that there are many more solutions for this issue, sych as making sure your target Contents and Locations have
+the same Remote_id in all environments, or passing values for references as options to the `migrate` command-line.
+
 ### How to update an existing Role to change its policies?
 
 When using a migration to update a Role, you must define ALL its policies. Any not defined will be removed.
@@ -346,11 +365,20 @@ update migration that has the complete specification of the role as it currently
 
 Example command to create such a migration:
 
-    php ezpublish/console kaliop:migration:generate --type=role --mode=update --match-type=identifier --match-value=Anonymous bundleName
+    php bin/console kaliop:migration:generate --type=role --mode=update --match-type=identifier --match-value=Anonymous bundleName
 
 ### When dumping a Content into a yml migration via the `generate` command, the list of attributes is empty
 
 A: this is most likely due to using a bad language configuration
+
+### Are there examples of implementing common tasks which require complex migrations?
+
+A: yes, please take a look in folder [Resources/doc/Cookbook/](Resources/doc/Cookbook/)
+
+### Can I run an external tool (command-line script) as part of a migration?
+
+A: sure. Take a look at the [relevant dsl](Resources/doc/DSL/Processes.yml) and [cookbook example](Resources/doc/Cookbook/generate_screenshot_of_video.yml)
+  for details.
 
 
 ## Extending the bundle
@@ -361,7 +389,7 @@ The bundle has been designed to be easily extended in many ways, such as:
 * adding support for custom/complex field-types
 * adding support for completely new actions in the Yml definitions
 * adding support for a new file format for storing migration definitions
-* adding support for a new resolver for the custom references in the migration definitions
+* adding support for new resolvers for the custom references in the migration definitions
 * taking over the way that the migrations definitions are loaded from the filesystem or stored in the database
 * etc...
 
@@ -370,6 +398,9 @@ and give it an appropriate tag (the class implementing service should of course 
 
 To find out the names of the tags that you need to implement, as well as for all the other services which you can
 override, take a look at the [services.yml file](Resources/config/services.yml).
+
+It is also possible to define custom event listeners/subscribers to expand migration execution logic. See the dedicated
+paragraphs above for more details.
 
 ### Running tests
 
@@ -391,16 +422,19 @@ It is recommended to run the tests suite using a dedicated eZPublish installatio
 #### Setting up a dedicated test environment for the bundle
 
 A safer choice to run the tests of the bundle is to set up a dedicated environment, similar to the one used when the test
-suite is run on Travis.
+suite is run on GitHub Actions.
 The advantages are multiple: on one hand you can start with any version of eZPublish you want; on the other you will
-be more confident that any tests you add or modify will also pass on Travis.
+be more confident that any tests you add or modify will also pass on GitHub.
 The disadvantages are that you will need Docker and Docker-compose, and that the environment you will use will look
 quite unlike a standard eZPublish setup! Also, it will take a considerable amount of disk space and time to build.
 
 Steps to set up a dedicated test environment and run the tests in it:
 
-    # if you have a github auth token, it is a good idea to copy it now to Tests/docker/data/.composer/auth.json
-    git clone --depth 1 --branch 0.2.0 https://github.com/tanoconsulting/euts.git teststack
+    git clone --depth 1 https://github.com/tanoconsulting/euts.git teststack
+    # if you have a github auth token, it is a good idea to copy it now to teststack/docker/data/.composer/auth.json
+
+    # this config sets up a test environment with Ibexa 4.2 running on php 8.0 / ubuntu jammy
+    export TESTSTACK_CONFIG_FILE=Tests/environment/.euts.4.2.env
 
     ./teststack/teststack build
     ./teststack/teststack runtests
@@ -426,8 +460,12 @@ Or command-line shell prompt to the Docker container where tests are run:
     ./teststack/teststack shell
 
 The tests in the Docker container run using the version of debian/php/eZPlatform kernel specified in the file
-`.euts.env`.
-If you want to test against a different version, feel free to:
+`Tests/environment/.euts.4.2.env`, as specified in env var `TESTSTACK_CONFIG_FILE`.
+If no value is set for that environment variable, a file named `.euts.env` is looked for.
+If no such file is present, some defaults are used, you can check the documentation in ./teststack/README.md to find out
+what they are.
+If you want to test against a different version of eZ/php/mysql/debian, feel free to:
+- create the `.euts.env` file, if it does not exist
 - add to it any required var (see file `teststack/.euts.env.example` as guidance)
 - rebuild the test stack
 - run tests the usual way

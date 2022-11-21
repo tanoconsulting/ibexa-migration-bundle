@@ -364,6 +364,7 @@ class MigrateTest extends MigrationExecutingTest
      * Get the eZ repository
      * @param int $loginUserId
      * @return \Ibexa\Contracts\Core\Repository\Repository
+     * @todo move to usage of ADMIN_USER_LOGIN
      */
     protected function getRepository($loginUserId = \Kaliop\eZMigrationBundle\Core\MigrationService::ADMIN_USER_ID)
     {
@@ -377,5 +378,15 @@ class MigrateTest extends MigrationExecutingTest
         }
 
         return $repository;
+    }
+
+    public static function returnInput($in)
+    {
+        return $in;
+    }
+
+    public static function returnException($message = '', $code = 0, $class = 'ErrorException')
+    {
+        throw new $class($message, $code);
     }
 }
