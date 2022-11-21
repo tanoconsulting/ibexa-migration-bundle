@@ -27,7 +27,7 @@ jobs:
                     - config-file: '.euts.4.2.env'
                       operating-system: 'ubuntu-22.04'
                       code-coverage: codecov
-                    - config_file: '.euts.4.3.env'
+                    - config-file: '.euts.4.3.env'
                       operating-system: 'ubuntu-22.04'
                       code-coverage: ~
         steps:
