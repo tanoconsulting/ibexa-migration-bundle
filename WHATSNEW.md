@@ -1,7 +1,7 @@
 Version: 1.0
 ============
 
-This release is aligned with kaliop/ezmigrationbundle rel. 6.3.0 / tanoconsulting/ezmigrationbundle2 rel. 1.0.
+This release is aligned with kaliop/ezmigrationbundle rel. 6.3.1 / tanoconsulting/ezmigrationbundle2 rel. 1.0.1
 
 * New: migration step `migration_definition/include`. This allows one migration to basically include another, the same
   way it is possible to do that in php.
@@ -29,6 +29,8 @@ This release is aligned with kaliop/ezmigrationbundle rel. 6.3.0 / tanoconsultin
 * Fixed: when generating contentType migrations, do export the `is-thumbnail` attribute for Content Type Fields, and
   the Content Type's `default_always_available`, `default_sort_order` and `default_sort_field`
 
+* Fixed: php warning when generating `Role` migrations for roles with policy limitations
+
 * Improved: when executing migrations with the `set-reference` cli option, the injected references will be saved in the
   migration status
 
@@ -41,7 +43,15 @@ This release is aligned with kaliop/ezmigrationbundle rel. 6.3.0 / tanoconsultin
 Version 1.0-alpha1
 ==================
 
-Initial release - forked from tanoconsulting/ezmigrationbundle ver. 1.0 alpha 3, merging wizhippo/ibexa-migration-bundle
+Initial release - forked from tanoconsulting/ezmigrationbundle2 ver. 1.0 alpha 3, merging wizhippo/ibexa-migration-bundle
+
+*Changes compared to tanoconsulting/ezmigrationbundle2 ver. 1.0 alpha 3:*
+
+* Fixed: in rare circumstances (having two siteaccesses configured with the same repo and root node, but different languages),
+  the TagMatcher could use the wrong language when matching by tag keyword
+
+* BC change (for developers extending the bundle): class `TagMatcher` changed its constructor signature. the same applies
+  to service `ez_migration_bundle.tag_matcher`
 
 *Explanation of the 'aplha' tag:*
 
