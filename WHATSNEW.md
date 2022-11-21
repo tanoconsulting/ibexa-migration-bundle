@@ -34,6 +34,8 @@ This release is aligned with kaliop/ezmigrationbundle rel. 6.3.1 / tanoconsultin
 * Improved: when executing migrations with the `set-reference` cli option, the injected references will be saved in the
   migration status
 
+* Improved: add to the test matrix running on GitHub Ibexa-OSS version 4.3
+
 * BC change (for developers extending the bundle): method `MigrateCommand::executeMigrationInProcess` changed its signature
 
 * BC change (for developers extending the bundle): `Migrationservice` methods `executeMigration`, `executeMigrationInner`
