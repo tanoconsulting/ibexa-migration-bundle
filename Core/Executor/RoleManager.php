@@ -486,9 +486,8 @@ class RoleManager extends RepositoryExecutor implements MigrationGeneratorInterf
             if (($fComp = strcmp($p1['function'], $p2['function'])) != 0) {
                 return $fComp;
             }
-/// @todo verify
             // ugly: sort by comparing limitations identifiers
-            return $this->compareArraysForSorting($p1['limitations'], $p2['limitations']);
+            /// @todo if limitations identifiers are the same, sort by lim. values...
             $p1LimIds = array();
             $p2LimIds = array();
             foreach ($p1['limitations'] as $lim) {
@@ -497,7 +496,6 @@ class RoleManager extends RepositoryExecutor implements MigrationGeneratorInterf
             foreach ($p2['limitations'] as $lim) {
                 $p2LimIds[] = $lim['identifier'];
             }
-            /// @todo if limitations identifier are the same, sort by lim. values...
             return $this->compareArraysForSorting($p1LimIds, $p2LimIds);
         });
     }
@@ -517,7 +515,7 @@ class RoleManager extends RepositoryExecutor implements MigrationGeneratorInterf
                 return $cmp;
             }
         }
-        // the array with less elements wins
+        // the array with fewer elements wins
         return count($a1) - count($a2);
     }
 }
