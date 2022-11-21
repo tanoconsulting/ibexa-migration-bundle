@@ -518,7 +518,9 @@ class ContentTypeManager extends RepositoryExecutor implements MigrationGenerato
                     $attributes[] = $this->fieldDefinitionToHash($contentType, $fieldDefinition, $context);
                 }
 
-                // TODO: remove when Fix for nulls returned in serialization
+                // Fix for nulls returned in descriptions serialization, which are not accepted at contentType creation.
+                /// @todo Remove when this does not happen any more
+                ///       (q: when did this start happening? It does not seem to be the case for eg. eZP 2.5...)
                 $descriptions = $contentType->getDescriptions();
                 if (is_array($descriptions)) {
                     foreach ($descriptions as &$description) {
