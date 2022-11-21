@@ -2,6 +2,7 @@
 
 namespace Kaliop\eZMigrationBundle\Core\Executor;
 
+use Ibexa\Contracts\Core\Repository\Values\User\Limitation;
 use Ibexa\Contracts\Core\Repository\Values\User\Role;
 use Ibexa\Contracts\Core\Repository\Values\User\RoleDraft;
 use Ibexa\Contracts\Core\Repository\RoleService;
