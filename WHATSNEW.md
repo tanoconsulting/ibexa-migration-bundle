@@ -1,3 +1,9 @@
+Version: 1.0.2
+==============
+
+* Fixed fatal errors when running builtin migration `FixExecutedMigrationsPaths`
+
+
 Version: 1.0.1
 ==============
 
