@@ -462,95 +462,98 @@ class ContentTypeManager extends RepositoryExecutor implements MigrationGenerato
      */
     public function generateMigration(array $matchConditions, $mode, array $context = array())
     {
-        $currentUser = $this->authenticateUserByContext($context);
-        $contentTypeCollection = $this->contentTypeMatcher->match($matchConditions);
         $data = array();
+        $currentUser = $this->authenticateUserByContext($context);
+        try {
+            $contentTypeCollection = $this->contentTypeMatcher->match($matchConditions);
 
-        /** @var \Ibexa\Contracts\Core\Repository\Values\ContentType\ContentType $contentType */
-        foreach ($contentTypeCollection as $contentType) {
+            /** @var \Ibexa\Contracts\Core\Repository\Values\ContentType\ContentType $contentType */
+            foreach ($contentTypeCollection as $contentType) {
 
-            $contentTypeData = array(
-                'type' => reset($this->supportedStepTypes),
-                'mode' => $mode
-            );
+                $contentTypeData = array(
+                    'type' => reset($this->supportedStepTypes),
+                    'mode' => $mode
+                );
 
-            switch ($mode) {
-                case 'create':
-                    $contentTypeGroups = $contentType->getContentTypeGroups();
-                    $contentTypeData = array_merge(
-                        $contentTypeData,
-                        array(
-                            'content_type_group' => reset($contentTypeGroups)->identifier,
-                            'identifier' => $contentType->identifier
-                        )
-                    );
-                    break;
-                case 'update':
-                    $contentTypeData = array_merge(
-                        $contentTypeData,
-                        // q: are we allowed to change the group in updates ?
-                        array(
-                            'match' => array(
-                                ContentTypeMatcher::MATCH_CONTENTTYPE_IDENTIFIER => $contentType->identifier
-                            ),
-                            'new_identifier' => $contentType->identifier,
-                        )
-                    );
-                    break;
-                case 'delete':
-                    $contentTypeData = array_merge(
-                        $contentTypeData,
-                        array(
-                            'match' => array(
-                                ContentTypeMatcher::MATCH_CONTENTTYPE_IDENTIFIER => $contentType->identifier
+                switch ($mode) {
+                    case 'create':
+                        $contentTypeGroups = $contentType->getContentTypeGroups();
+                        $contentTypeData = array_merge(
+                            $contentTypeData,
+                            array(
+                                'content_type_group' => reset($contentTypeGroups)->identifier,
+                                'identifier' => $contentType->identifier
                             )
-                        )
-                    );
-                    break;
-                default:
-                    throw new InvalidStepDefinitionException("Executor 'content_type' doesn't support mode '$mode'");
-            }
-
-            if ($mode != 'delete') {
-
-                $attributes = array();
-                foreach ($contentType->getFieldDefinitions() as $i => $fieldDefinition) {
-                    $attributes[] = $this->fieldDefinitionToHash($contentType, $fieldDefinition, $context);
+                        );
+                        break;
+                    case 'update':
+                        $contentTypeData = array_merge(
+                            $contentTypeData,
+                            // q: are we allowed to change the group in updates ?
+                            array(
+                                'match' => array(
+                                    ContentTypeMatcher::MATCH_CONTENTTYPE_IDENTIFIER => $contentType->identifier
+                                ),
+                                'new_identifier' => $contentType->identifier,
+                            )
+                        );
+                        break;
+                    case 'delete':
+                        $contentTypeData = array_merge(
+                            $contentTypeData,
+                            array(
+                                'match' => array(
+                                    ContentTypeMatcher::MATCH_CONTENTTYPE_IDENTIFIER => $contentType->identifier
+                                )
+                            )
+                        );
+                        break;
+                    default:
+                        throw new InvalidStepDefinitionException("Executor 'content_type' doesn't support mode '$mode'");
                 }
 
-                // Fix for nulls returned in descriptions serialization, which are not accepted at contentType creation.
-                /// @todo Remove when this does not happen any more
-                ///       (q: when did this start happening? It does not seem to be the case for eg. eZP 2.5...)
-                $descriptions = $contentType->getDescriptions();
-                if (is_array($descriptions)) {
-                    foreach ($descriptions as &$description) {
-                        if (is_null($description)) {
-                            $description = "";
+                if ($mode != 'delete') {
+
+                    $attributes = array();
+                    foreach ($contentType->getFieldDefinitions() as $i => $fieldDefinition) {
+                        $attributes[] = $this->fieldDefinitionToHash($contentType, $fieldDefinition, $context);
+                    }
+
+                    // Fix for nulls returned in descriptions serialization, which are not accepted at contentType creation.
+                    /// @todo Remove when this does not happen any more
+                    ///       (q: when did this start happening? It does not seem to be the case for eg. eZP 2.5...)
+                    $descriptions = $contentType->getDescriptions();
+                    if (is_array($descriptions)) {
+                        foreach ($descriptions as &$description) {
+                            if (is_null($description)) {
+                                $description = "";
+                            }
                         }
                     }
+
+                    $contentTypeData = array_merge(
+                        $contentTypeData,
+                        array(
+                            'name' => $contentType->getNames(),
+                            'description' => $descriptions,
+                            'name_pattern' => $contentType->nameSchema,
+                            'url_name_pattern' => $contentType->urlAliasSchema,
+                            'is_container' => $contentType->isContainer,
+                            'default_always_available' => $contentType->defaultAlwaysAvailable,
+                            'default_sort_field' => $this->sortConverter->sortField2Hash($contentType->defaultSortField),
+                            'default_sort_order' => $this->sortConverter->sortOrder2Hash($contentType->defaultSortOrder),
+                            'lang' => $this->getLanguageCodeFromContext($context),
+                            'attributes' => $attributes
+                        )
+                    );
                 }
 
-                $contentTypeData = array_merge(
-                    $contentTypeData,
-                    array(
-                        'name' => $contentType->getNames(),
-                        'description' => $descriptions,
-                        'name_pattern' => $contentType->nameSchema,
-                        'url_name_pattern' => $contentType->urlAliasSchema,
-                        'is_container' => $contentType->isContainer,
-                        'default_always_available' => $contentType->defaultAlwaysAvailable,
-                        'default_sort_field' => $this->sortConverter->sortField2Hash($contentType->defaultSortField),
-                        'default_sort_order' => $this->sortConverter->sortOrder2Hash($contentType->defaultSortOrder),
-                        'lang' => $this->getLanguageCodeFromContext($context),
-                        'attributes' => $attributes
-                    )
-                );
+                $data[] = $contentTypeData;
             }
-
-            $data[] = $contentTypeData;
+        } finally {
+            $this->authenticateUserByReference($currentUser);
         }
 
-        $this->authenticateUserByReference($currentUser);
         return $data;
     }
 

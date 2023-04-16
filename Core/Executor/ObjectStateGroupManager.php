@@ -198,74 +198,77 @@ class ObjectStateGroupManager extends RepositoryExecutor implements MigrationGen
      */
     public function generateMigration(array $matchConditions, $mode, array $context = array())
     {
-        $currentUser = $this->authenticateUserByContext($context);
-        $objectStateGroupCollection = $this->objectStateGroupMatcher->match($matchConditions);
         $data = array();
+        $currentUser = $this->authenticateUserByContext($context);
+        try {
+            $objectStateGroupCollection = $this->objectStateGroupMatcher->match($matchConditions);
 
-        /** @var \Ibexa\Contracts\Core\Repository\Values\ObjectState\ObjectStateGroup $objectStateGroup */
-        foreach ($objectStateGroupCollection as $objectStateGroup) {
+            /** @var \Ibexa\Contracts\Core\Repository\Values\ObjectState\ObjectStateGroup $objectStateGroup */
+            foreach ($objectStateGroupCollection as $objectStateGroup) {
 
-            $groupData = array(
-                'type' => reset($this->supportedStepTypes),
-                'mode' => $mode,
-            );
-
-            switch ($mode) {
-                case 'create':
-                    $groupData = array_merge(
-                        $groupData,
-                        array(
-                            'identifier' => $objectStateGroup->identifier,
-                        )
-                    );
-                    break;
-                case 'update':
-                    $groupData = array_merge(
-                        $groupData,
-                        array(
-                            'match' => array(
-                                ObjectStateGroupMatcher::MATCH_OBJECTSTATEGROUP_IDENTIFIER => $objectStateGroup->identifier
-                            ),
-                            'identifier' => $objectStateGroup->identifier,
-                        )
-                    );
-                    break;
-                case 'delete':
-                    $groupData = array_merge(
-                        $groupData,
-                        array(
-                            'match' => array(
-                                ObjectStateGroupMatcher::MATCH_OBJECTSTATEGROUP_IDENTIFIER => $objectStateGroup->identifier
-                            )
-                        )
-                    );
-                    break;
-                default:
-                    throw new InvalidStepDefinitionException("Executor 'object_state_group' doesn't support mode '$mode'");
-            }
-
-            if ($mode != 'delete') {
-                $names = array();
-                $descriptions = array();
-                foreach ($objectStateGroup->languageCodes as $languageCode) {
-                    $names[$languageCode] =  $objectStateGroup->getName($languageCode);
-                }
-                foreach ($objectStateGroup->languageCodes as $languageCode) {
-                    $descriptions[$languageCode] =  $objectStateGroup->getDescription($languageCode);
-                }
-                $groupData = array_merge(
-                    $groupData,
-                    array(
-                        'names' => $names,
-                        'descriptions' => $descriptions,
-                    )
+                $groupData = array(
+                    'type' => reset($this->supportedStepTypes),
+                    'mode' => $mode,
                 );
-            }
 
-            $data[] = $groupData;
+                switch ($mode) {
+                    case 'create':
+                        $groupData = array_merge(
+                            $groupData,
+                            array(
+                                'identifier' => $objectStateGroup->identifier,
+                            )
+                        );
+                        break;
+                    case 'update':
+                        $groupData = array_merge(
+                            $groupData,
+                            array(
+                                'match' => array(
+                                    ObjectStateGroupMatcher::MATCH_OBJECTSTATEGROUP_IDENTIFIER => $objectStateGroup->identifier
+                                ),
+                                'identifier' => $objectStateGroup->identifier,
+                            )
+                        );
+                        break;
+                    case 'delete':
+                        $groupData = array_merge(
+                            $groupData,
+                            array(
+                                'match' => array(
+                                    ObjectStateGroupMatcher::MATCH_OBJECTSTATEGROUP_IDENTIFIER => $objectStateGroup->identifier
+                                )
+                            )
+                        );
+                        break;
+                    default:
+                        throw new InvalidStepDefinitionException("Executor 'object_state_group' doesn't support mode '$mode'");
+                }
+
+                if ($mode != 'delete') {
+                    $names = array();
+                    $descriptions = array();
+                    foreach ($objectStateGroup->languageCodes as $languageCode) {
+                        $names[$languageCode] =  $objectStateGroup->getName($languageCode);
+                    }
+                    foreach ($objectStateGroup->languageCodes as $languageCode) {
+                        $descriptions[$languageCode] =  $objectStateGroup->getDescription($languageCode);
+                    }
+                    $groupData = array_merge(
+                        $groupData,
+                        array(
+                            'names' => $names,
+                            'descriptions' => $descriptions,
+                        )
+                    );
+                }
+
+                $data[] = $groupData;
+            }
+        } finally {
+            $this->authenticateUserByReference($currentUser);
         }
 
-        $this->authenticateUserByReference($currentUser);
         return $data;
     }
 

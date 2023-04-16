@@ -179,58 +179,61 @@ class SectionManager extends RepositoryExecutor implements MigrationGeneratorInt
      */
     public function generateMigration(array $matchConditions, $mode, array $context = array())
     {
-        $currentUser = $this->authenticateUserByContext($context);
-        $sectionCollection = $this->sectionMatcher->match($matchConditions);
         $data = array();
+        $currentUser = $this->authenticateUserByContext($context);
+        try {
+            $sectionCollection = $this->sectionMatcher->match($matchConditions);
 
-        /** @var \Ibexa\Contracts\Core\Repository\Values\Content\Section $section */
-        foreach ($sectionCollection as $section) {
+            /** @var \Ibexa\Contracts\Core\Repository\Values\Content\Section $section */
+            foreach ($sectionCollection as $section) {
 
-            $sectionData = array(
-                'type' => reset($this->supportedStepTypes),
-                'mode' => $mode,
-            );
+                $sectionData = array(
+                    'type' => reset($this->supportedStepTypes),
+                    'mode' => $mode,
+                );
 
-            switch ($mode) {
-                case 'create':
-                    $sectionData = array_merge(
-                        $sectionData,
-                        array(
-                            'identifier' => $section->identifier,
-                            'name' => $section->name,
-                        )
-                    );
-                    break;
-                case 'update':
-                    $sectionData = array_merge(
-                        $sectionData,
-                        array(
-                            'match' => array(
-                                SectionMatcher::MATCH_SECTION_ID => $section->id
-                            ),
-                            'identifier' => $section->identifier,
-                            'name' => $section->name,
-                        )
-                    );
-                    break;
-                case 'delete':
-                    $sectionData = array_merge(
-                        $sectionData,
-                        array(
-                            'match' => array(
-                                SectionMatcher::MATCH_SECTION_ID => $section->id
+                switch ($mode) {
+                    case 'create':
+                        $sectionData = array_merge(
+                            $sectionData,
+                            array(
+                                'identifier' => $section->identifier,
+                                'name' => $section->name,
                             )
-                        )
-                    );
-                    break;
-                default:
-                    throw new InvalidStepDefinitionException("Executor 'section' doesn't support mode '$mode'");
-            }
+                        );
+                        break;
+                    case 'update':
+                        $sectionData = array_merge(
+                            $sectionData,
+                            array(
+                                'match' => array(
+                                    SectionMatcher::MATCH_SECTION_ID => $section->id
+                                ),
+                                'identifier' => $section->identifier,
+                                'name' => $section->name,
+                            )
+                        );
+                        break;
+                    case 'delete':
+                        $sectionData = array_merge(
+                            $sectionData,
+                            array(
+                                'match' => array(
+                                    SectionMatcher::MATCH_SECTION_ID => $section->id
+                                )
+                            )
+                        );
+                        break;
+                    default:
+                        throw new InvalidStepDefinitionException("Executor 'section' doesn't support mode '$mode'");
+                }
 
-            $data[] = $sectionData;
+                $data[] = $sectionData;
+            }
+        } finally {
+            $this->authenticateUserByReference($currentUser);
         }
 
-        $this->authenticateUserByReference($currentUser);
         return $data;
     }
 
