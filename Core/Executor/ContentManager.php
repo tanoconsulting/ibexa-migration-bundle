@@ -526,10 +526,10 @@ class ContentManager extends RepositoryExecutor implements MigrationGeneratorInt
      *       - match by rid vs match by id on update and on delete
      *       - etc...
      */
-    public function generateMigration(array $matchCondition, $mode, array $context = array())
+    public function generateMigration(array $matchConditions, $mode, array $context = array())
     {
         $currentUser = $this->authenticateUserByContext($context);
-        $contentCollection = $this->contentMatcher->match($matchCondition);
+        $contentCollection = $this->contentMatcher->match($matchConditions);
         /// @todo throw if nothing is matched?
         $data = array();
 

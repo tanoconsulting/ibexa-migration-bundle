@@ -172,10 +172,10 @@ class ContentTypeGroupManager extends RepositoryExecutor implements MigrationGen
      * @throws \Exception
      * @return array
      */
-    public function generateMigration(array $matchCondition, $mode, array $context = array())
+    public function generateMigration(array $matchConditions, $mode, array $context = array())
     {
         $currentUser = $this->authenticateUserByContext($context);
-        $contentTypeGroupCollection = $this->contentTypeGroupMatcher->match($matchCondition);
+        $contentTypeGroupCollection = $this->contentTypeGroupMatcher->match($matchConditions);
         $data = array();
 
         /** @var \Ibexa\Contracts\Core\Repository\Values\ContentType\ContentTypeGroup $contentTypeGroup */

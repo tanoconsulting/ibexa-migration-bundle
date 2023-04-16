@@ -225,10 +225,10 @@ class RoleManager extends RepositoryExecutor implements MigrationGeneratorInterf
      * @throws \Exception
      * @return array
      */
-    public function generateMigration(array $matchCondition, $mode, array $context = array())
+    public function generateMigration(array $matchConditions, $mode, array $context = array())
     {
         $currentUser = $this->authenticateUserByContext($context);
-        $roleCollection = $this->roleMatcher->match($matchCondition);
+        $roleCollection = $this->roleMatcher->match($matchConditions);
         $data = array();
 
         /** @var \Ibexa\Contracts\Core\Repository\Values\User\Role $role */
