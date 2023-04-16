@@ -154,6 +154,8 @@ services:
         calls:
             - ['setPermissionResolver', ['@Ibexa\Contracts\Core\Repository\PermissionResolver']]
             - ['setUserService', ['@Ibexa\Contracts\Core\Repository\UserService']]
+            # @todo review - is this the best way to get a handle on this ?
+            - ['setConnection', ['@ibexa.api.storage_engine.legacy.connection']]
 
     ### loaders
 
@@ -209,7 +211,6 @@ services:
     ez_migration_bundle.storage_handler.database:
         class: '%ez_migration_bundle.storage_handler.database.class%'
         arguments:
-            # @todo review - is this the best way to get a handle on this ?
             - '@ibexa.api.storage_engine.legacy.connection'
             - 'ez_migration_bundle.table_name'
             - '@ez_migration_bundle.helper.config.resolver'
