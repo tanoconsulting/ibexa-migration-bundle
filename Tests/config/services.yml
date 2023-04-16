@@ -5,6 +5,32 @@
 parameters:
     test.param.for.custom.refs: def
 
+    # work around IBX-5153
+    ibexa.site_access.config.default.image_variations:
+        reference:
+            reference: ~
+            filters:
+                geometry/scaledownonly: [600, 600]
+        small:
+            reference: reference
+            filters:
+                geometry/scaledownonly: [100, 100]
+        tiny:
+            reference: reference
+            filters:
+                geometry/scaledownonly: [30, 30]
+        medium:
+            reference: reference
+            filters:
+                geometry/scaledownonly: [200, 200]
+        large:
+            reference: reference
+            filters:
+                geometry/scaledownonly: [300, 300]
+        original:
+            reference: reference
+            filters: []
+
 services:
     ez_migration_bundle.test.executor.assert:
         class: Kaliop\eZMigrationBundle\Tests\helper\AssertExecutor
