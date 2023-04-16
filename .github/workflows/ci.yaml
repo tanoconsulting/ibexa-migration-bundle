@@ -30,6 +30,9 @@ jobs:
                     - config-file: '.euts.4.3.env'
                       operating-system: 'ubuntu-22.04'
                       code-coverage: ~
+                    - config-file: '.euts.4.4.env'
+                      operating-system: 'ubuntu-22.04'
+                      code-coverage: ~
         steps:
             -   name: checkout code
                 uses: actions/checkout@v3
