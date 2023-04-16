@@ -6,6 +6,7 @@ parameters:
     test.param.for.custom.refs: def
 
     # work around IBX-5153
+    # @todo whould we move this config snippet to EUTS?
     ibexa.site_access.config.default.image_variations:
         reference:
             reference: ~
