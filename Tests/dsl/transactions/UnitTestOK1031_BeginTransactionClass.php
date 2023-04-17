@@ -9,7 +9,7 @@ class BeginTransactionClass implements MigrationInterface
     public static function execute(ContainerInterface $container)
     {
         /** @var \Doctrine\DBAL\Connection $conn */
-        $conn = $container->get('ezpublish.persistence.connection');
+        $conn = $container->get('ibexa.persistence.connection');
         $conn->beginTransaction();
         $stmt = $conn->executeQuery('SELECT SYSDATE();');
         $rows = $stmt->fetchAllAssociative();
