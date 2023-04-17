@@ -5,8 +5,10 @@
 parameters:
     test.param.for.custom.refs: def
 
-    # work around IBX-5153
-    # @todo whould we move this config snippet to EUTS?
+    # Work around IBX-5153, which is closed WONTFIX for eZP versions 4.0 to 4.3.
+    # Config copied from default_settings.yml in ibexa/core and extended with `original` variation
+    # @todo should we move this config snippet to EUTS?
+    #       Also, do we need to redefine all variations or would it be enough to only add `original`?
     ibexa.site_access.config.default.image_variations:
         reference:
             reference: ~
