@@ -1,3 +1,9 @@
+Version: 1.0.4
+==============
+
+* Fixed: the `--admin-login` option was broken for `migrate` commands
+
+
 Version: 1.0.3
 ==============
 
