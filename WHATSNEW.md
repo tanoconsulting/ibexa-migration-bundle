@@ -1,3 +1,9 @@
+Version: 1.0.5
+==============
+
+* Fixed: Crash when using `roles` in `user/create` migrations (Issue #4)
+
+
 Version: 1.0.4
 ==============
 

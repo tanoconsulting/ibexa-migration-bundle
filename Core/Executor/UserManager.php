@@ -6,6 +6,7 @@ use Ibexa\Contracts\Core\Repository\Values\User\User;
 use Kaliop\eZMigrationBundle\API\Collection\UserCollection;
 use Kaliop\eZMigrationBundle\API\Exception\InvalidStepDefinitionException;
 use Kaliop\eZMigrationBundle\API\Exception\MigrationBundleException;
+use Kaliop\eZMigrationBundle\Core\Matcher\RoleMatcher;
 use Kaliop\eZMigrationBundle\Core\Matcher\UserGroupMatcher;
 use Kaliop\eZMigrationBundle\Core\Matcher\UserMatcher;
 
@@ -21,10 +22,13 @@ class UserManager extends RepositoryExecutor
 
     protected $userGroupMatcher;
 
-    public function __construct(UserMatcher $userMatcher, UserGroupMatcher $userGroupMatcher)
+    protected $roleMatcher;
+
+    public function __construct(UserMatcher $userMatcher, UserGroupMatcher $userGroupMatcher, RoleMatcher $roleMatcher)
     {
         $this->userMatcher = $userMatcher;
         $this->userGroupMatcher = $userGroupMatcher;
+        $this->roleMatcher = $roleMatcher;
     }
 
     /**
