@@ -15,8 +15,11 @@ It is inspired by the [DoctrineMigrationsBundle](http://symfony.com/doc/current/
 
 * Ibexa 4.0 (aka. Ibexa DXP).
 
-For Ibexa DXP 3, head on to [tanoconsulting/ezmigrationbundle2](https://github.com/tanoconsulting/ezmigrationbundle2). For eZPlatform 1-2 and earlier, to
-[kaliop-uk/ezmigrationbundle](https://github.com/kaliop-uk/ezmigrationbundle).
+For Ibexa DXP 5, head on to [mrk-te/ibexa-migration-bundle2](https://github.com/mrk-te/ibexa-migration-bundle2).
+
+For Ibexa DXP 3, head on to [tanoconsulting/ezmigrationbundle2](https://github.com/tanoconsulting/ezmigrationbundle2).
+
+For eZPlatform 1-2 and earlier, to [kaliop-uk/ezmigrationbundle](https://github.com/kaliop-uk/ezmigrationbundle).
 
 
 ## Installation
