@@ -1,3 +1,8 @@
+Version: 1.0.6
+==============
+
+* Fixed: Option `remove_drafts: true` not woking on content_type / update if draft belongs to another user than `admin`
+
 Version: 1.0.5
 ==============
 

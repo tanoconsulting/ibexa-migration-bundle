@@ -159,7 +159,7 @@ class ContentTypeManager extends RepositoryExecutor implements MigrationGenerato
 
             if (isset($step->dsl['remove_drafts']) && $step->dsl['remove_drafts']) {
                 try {
-                    $draft = $contentTypeService->loadContentTypeDraft($contentType->id);
+                    $draft = $contentTypeService->loadContentTypeDraft($contentType->id, true);
                     $contentTypeService->deleteContentType($draft);
                 } catch (NotFoundException $e) {
                 }
